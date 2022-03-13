@@ -25,11 +25,11 @@ class CashDrawer:
         """Constructor to initialize the cash drawer."""
         self.__contents: Dict[CashDenomination, int] = dict()
         for denom in CashDenomination:
-            self.__contents[denom] = 10
+            self.__contents[denom] = 9 
         self.__open: bool = False
         self.__updated_total: int = 0
 
-    def get_count(self, denom: CashDenomination) -> int:
+    def get_count(self, denom: CashDenomination) -> bool:
         """Get the count of the denomination in the drawer.
 
         Args:

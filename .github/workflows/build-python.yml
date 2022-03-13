@@ -1,0 +1,68 @@
+# Build Python Workflow
+# 
+# Based on Starter Workflow Here
+# https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python#using-the-python-starter-workflow
+
+# Workflow name
+name: Build Python
+
+# Run only on pushes and pull requests on main branch, as well as tags
+# https://docs.github.com/en/actions/using-workflows/triggering-a-workflow
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*.*.*"
+  pull_request:
+    branches:    
+      - main
+
+# Define a single job named build
+jobs:
+  build:
+
+    # Run job on Ubuntu runner
+    runs-on: ubuntu-latest
+
+    # Job Steps
+    steps:
+
+      # Step 1 - Checkout the Repository
+      # https://github.com/actions/checkout
+      - name: 1 - Checkout Repository
+        uses: actions/checkout@v2
+      
+      # Step 2 - Set up Python 3
+      # https://github.com/actions/setup-python
+      - name: 2- Set up Python 3
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.6'     # Version range or exact version of a Python version to use
+          architecture: 'x64'       # optional x64 or x86. Defaults to x64 if not specified
+          cache: 'pip'              # cache pip requirements
+
+      # Step 3 - Install Dependencies
+      # https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python#requirements-file
+      - name: 3 - Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - name: Setup flake8 annotations
+        uses: rbialon/flake8-annotations@v1
+      
+      # Step 4 - Run Tox
+      # https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python#running-tests-with-tox
+      - name: 4 - Run Tox
+        run: tox -e py
+
+      # Step 5A - Publish JUnit Report
+      # https://github.com/marketplace/actions/junit-report-action
+      - name: 5A - Publish JUnit Report
+        uses: mikepenz/action-junit-report@v2
+        if: always()                # always run even if the previous step fails
+        with:
+          report_paths: |
+            reports/mypy/mypy.xml
+            reports/pytest/pytest.xml

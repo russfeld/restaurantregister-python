@@ -1,5 +1,4 @@
 build
-coverage
 flake8
 flake8-docstrings
 flake8-html
@@ -9,5 +8,6 @@ pdoc3
 pep8-naming
 pyhamcrest
 pytest
+pytest-cov
 pytest-html
 tox
