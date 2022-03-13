@@ -25,7 +25,7 @@ class CashDrawer:
         """Constructor to initialize the cash drawer."""
         self.__contents: Dict[CashDenomination, int] = dict()
         for denom in CashDenomination:
-            self.__contents[denom] = 9 
+            self.__contents[denom] = 9    
         self.__open: bool = False
         self.__updated_total: int = 0
 
