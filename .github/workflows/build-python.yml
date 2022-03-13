@@ -63,7 +63,9 @@ jobs:
       - uses: reviewdog/action-flake8@v3
         if: always()                # always run even if the previous step fails
         with:
+          flake8_args: --docstring-convention google
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-check
 
 
       # Step 5A - Publish JUnit Report
