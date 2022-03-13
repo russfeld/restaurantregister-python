@@ -49,31 +49,70 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
       
-      #- name: Setup flake8 annotations
-      #  uses: rbialon/flake8-annotations@v1
-      
       # Step 4 - Run Tox
       # https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python#running-tests-with-tox
       - name: 4 - Run Tox
         run: tox -e py
 
-      # - uses: TrueBrain/actions-flake8@v2
-      #  if: always()                # always run even if the previous step fails
-
-      - uses: reviewdog/action-flake8@v3
-        if: always()                # always run even if the previous step fails
-        with:
-          flake8_args: --docstring-convention google
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          reporter: github-check
-
-
-      # Step 5A - Publish JUnit Report
+      # Step 5A - Publish Test Reports
       # https://github.com/marketplace/actions/junit-report-action
-      - name: 5A - Publish JUnit Report
+      - name: 5A - Publish Test Reports
         uses: mikepenz/action-junit-report@v2
         if: always()                # always run even if the previous step fails
         with:
           report_paths: |
             reports/mypy/mypy.xml
             reports/pytest/pytest.xml
+      
+      # Step 5B - Run Flake8 and Publish Annotations
+      # https://github.com/reviewdog/action-flake8
+      - name: 5B - Run Flake8 and Publish Annotations
+        uses: reviewdog/action-flake8@v3
+        if: always()                # always run even if the previous step fails
+        with:
+          flake8_args: --docstring-convention google
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-check
+      
+      # ----------------------------------------------------------
+      # THESE ONLY RUN IF BUILD SUCCEEDS
+      # ----------------------------------------------------------
+
+      # Step 6 - Save Files from Build
+      # https://github.com/actions/upload-artifact
+      - name: 6 - Archive Build Files
+        uses: actions/upload-artifact@v3
+        with:
+          path: |
+            dist/*
+
+      # Step 7 - Generate Coverage Badges
+      # https://github.com/action-badges/cobertura-coverage-xml-badges
+      - name: 7 - Generate Coverage Badges
+        uses: action-badges/cobertura-coverage-xml-badges@0.2.1
+        with:
+          file-name: coverage.svg
+          badge-branch: badges
+          github-token: '${{ secrets.GITHUB_TOKEN }}'
+          coverage-file-name: ./reports/coverage/coverage.xml
+
+      # ----------------------------------------------------------
+      # THESE ONLY RUN IF NEW TAG IS PUSHED - WILL CREATE RELEASE
+      # ----------------------------------------------------------
+
+      # Step 8 - Deploy PDoc to GitHub Pages
+      # https://github.com/JamesIves/github-pages-deploy-action
+      - name: 8 - Deploy PDoc
+        uses: JamesIves/github-pages-deploy-action@v4.2.5
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          branch: gh-pages                  # The branch the action should deploy to
+          folder: ./reports/doc/cc410/      # The folder the action should deploy
+      
+      # Step 9 - Make Release on GitHub
+      # https://github.com/softprops/action-gh-release
+      - name: 9 - Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: app/build/libs/*.jar
