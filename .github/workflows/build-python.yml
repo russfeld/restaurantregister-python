@@ -132,7 +132,7 @@ jobs:
       # Step 10B - Publish to PyPI
       # https://github.com/pypa/gh-action-pypi-publish
       # https://packaging.python.org/en/latest/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/
-      #- name: 10B - Publish to PyPi
-      #  uses: pypa/gh-action-pypi-publish@master
-      #  with:
-      #    password: ${{ secrets.PYPI_API_TOKEN }}
+      - name: 10B - Publish to PyPi
+        uses: pypa/gh-action-pypi-publish@master
+        with:
+          password: ${{ secrets.PYPI_API_TOKEN }}
