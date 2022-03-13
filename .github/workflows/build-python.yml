@@ -49,13 +49,15 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
       
-      - name: Setup flake8 annotations
-        uses: rbialon/flake8-annotations@v1
+      #- name: Setup flake8 annotations
+      #  uses: rbialon/flake8-annotations@v1
       
       # Step 4 - Run Tox
       # https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python#running-tests-with-tox
       - name: 4 - Run Tox
         run: tox -e py
+
+      - uses: TrueBrain/actions-flake8@v2
 
       # Step 5A - Publish JUnit Report
       # https://github.com/marketplace/actions/junit-report-action
