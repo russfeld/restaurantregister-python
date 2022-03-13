@@ -58,6 +58,7 @@ jobs:
         run: tox -e py
 
       - uses: TrueBrain/actions-flake8@v2
+        if: always()                # always run even if the previous step fails
 
       # Step 5A - Publish JUnit Report
       # https://github.com/marketplace/actions/junit-report-action
